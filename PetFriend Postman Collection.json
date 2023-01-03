@@ -1,0 +1,564 @@
+{
+	"info": {
+		"_postman_id": "09f97a48-fbee-48ab-aabf-12ed991c4a7f",
+		"name": "PetFriend Postman Collection",
+		"description": "Создать коллекцию следующего сценария:\n\n1.  **Запрос:** Получение ключа.\n    \n\n*   **Обязательный тест:** Проверка статус-кода и запись полученного API-ключа в переменную ***auth_key*** (переменная должна быть доступна в заголовках следующих запросов).\n    \n\n2\\. **Запрос:** Добавление питомца с фото.\n\n*   **Обязательный тест:** Проверка статус-кода, добавление ***ID*** питомца из ответа в переменную ***first_petid*** коллекции Postman и запись ***name***, ***animal_type***, ***age*** из ответа в переменные ***first_name, first_type, first_age*** коллекции Postman.\n    \n\n3\\. **Запрос:** Добавление питомца без фото.\n\n*   **Обязательный тест:** Проверка статус-кода, добавление ***ID*** питомца из ответа в переменную ***second_petid*** коллекции Postman и запись ***name***, ***animal_type***, ***age*** из ответа в переменные ***second_name, second_type, second_age*** коллекции Postman.\n    \n\n4\\. **Запрос:** Добавление фото к созданному питомцу без фото.\n\n*   **Обязательный тест:** Проверка статус-кода.\n    \n\n5\\. **Запрос:** Получение списка питомцев.\n\n*   **Обязательный тест:** Проверка статус-кода, проверка, что переменные ***second_petid*** и ***second_name*** коллекции Postman равны значениям ***id*** и ***name*** первого ***питомца(\\[0\\])*** и проверка, что переменные ***first_petid*** и ***first_name*** коллекции Postman равны значениям ***id*** и ***name*** второго ***питомца(\\[1\\]).***\n    \n\n6\\. **Запрос:** Обновление данных первого питомца.\n\n*   **Обязательный тест:** Проверка статус-кода и запись ***name***, ***animal_type***, ***age*** из ответа в переменные ***update_name, update_type, update_age*** коллекции Postman.\n    \n\n7\\. **Запрос:** Удаление второго питомца.\n\n*   **Обязательный тест:** Проверка статус-кода.\n    \n\n8\\. **Запрос:** Получение обновленного списка питомцев.\n\n*   **Обязательный тест:** Проверка статус-кода, проверка, что переменные ***update_name, update_type, update_age*** коллекции Postman равны значениям ***name, animal_type, age*** первого ***питомца(\\[0\\])*** и проверка, что переменная ***second_petid*** не равно ***ID*** первого ***питомца(\\[0\\]).***\n    \n\n9\\. **Запрос:** Удаление первого питомца.\n\n*   **Обязательный тест:** Проверка статус-кода.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add API-key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Key is responseBody\", function () {",
+							"    var jsonData = JSON.parse(responseBody);",
+							"    pm.expect(jsonData).to.have.all.keys(\"key\");",
+							"    pm.collectionVariables.set(\"auth_key\", jsonData.key);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "email",
+						"value": "lionel_messi@mail.ru",
+						"type": "text"
+					},
+					{
+						"key": "password",
+						"value": "12345",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/key",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"key"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new pets with img",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"First pet data added\", function () {",
+							"    let jsonData = JSON.parse(responseBody);",
+							"    pm.collectionVariables.set(\"first_petid\", jsonData.id)",
+							"    pm.collectionVariables.set(\"first_name\", jsonData.name);",
+							"    pm.collectionVariables.set(\"first_type\", jsonData.animal_type);",
+							"    pm.collectionVariables.set(\"first_age\", jsonData.age);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{first_name}}",
+							"type": "text"
+						},
+						{
+							"key": "animal_type",
+							"value": "{{first_type}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{first_age}}",
+							"type": "text"
+						},
+						{
+							"key": "pet_photo",
+							"type": "file",
+							"src": "dog.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/pets",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new pets without img",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Second pet data added\", function () {",
+							"    let jsonData = JSON.parse(responseBody);",
+							"    pm.collectionVariables.set(\"second_petid\", jsonData.id)",
+							"    pm.collectionVariables.set(\"second_name\", jsonData.name);",
+							"    pm.collectionVariables.set(\"second_type\", jsonData.animal_type);",
+							"    pm.collectionVariables.set(\"second_age\", jsonData.age);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{second_name}}",
+							"type": "text"
+						},
+						{
+							"key": "animal_type",
+							"value": "{{second_type}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{second_age}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/create_pet_simple",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"create_pet_simple"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a photo for a pet without an img",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "pet_photo",
+							"type": "file",
+							"src": "bull.jpeg"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/pets/set_photo/{{second_petid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets",
+						"set_photo",
+						"{{second_petid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a list of pets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"First pets added\", function () {",
+							"    var jsonData = JSON.parse(responseBody);",
+							"    pm.expect(pm.collectionVariables.get(\"first_petid\")).to.eql(jsonData.pets[1].id);",
+							"});",
+							"",
+							"pm.test(\"Second pets added\", function () {",
+							"    var jsonData = JSON.parse(responseBody);",
+							"    pm.expect(pm.collectionVariables.get(\"second_petid\")).to.eql(jsonData.pets[0].id);",
+							"});",
+							"",
+							"pm.test(\"First pet name matches\", function () {",
+							"    var jsonData = JSON.parse(responseBody);",
+							"    pm.expect(pm.collectionVariables.get(\"first_name\")).to.eql(jsonData.pets[1].name)",
+							"})",
+							"",
+							"pm.test(\"Second pet name matches\", function () {",
+							"    var jsonData = JSON.parse(responseBody);",
+							"    pm.expect(pm.collectionVariables.get(\"second_name\")).to.eql(jsonData.pets[0].name)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/pets?filter=my_pets",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "my_pets"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update info first pet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Update pet info\", function () {",
+							"    let jsonData = JSON.parse(responseBody);",
+							"    pm.collectionVariables.set(\"update_name\", jsonData.name);",
+							"    pm.collectionVariables.set(\"update_type\", jsonData.animal_type);",
+							"    pm.collectionVariables.set(\"update_age\", jsonData.age);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{update_name}}",
+							"type": "text"
+						},
+						{
+							"key": "animal_type",
+							"value": "{{update_type}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{update_age}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/pets/{{first_petid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets",
+						"{{first_petid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete second pet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/pets/{{second_petid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets",
+						"{{second_petid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a new list of pets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"First pet info updated\", function () {",
+							"    let jsonData = JSON.parse(responseBody);",
+							"    pm.expect(pm.collectionVariables.get(\"first_petid\")).to.eql(jsonData.pets[0].id);",
+							"    pm.expect(pm.collectionVariables.get(\"update_name\")).to.eql(jsonData.pets[0].name);",
+							"    pm.expect(pm.collectionVariables.get(\"update_type\")).to.eql(jsonData.pets[0].animal_type);",
+							"    pm.expect(pm.collectionVariables.get(\"update_age\")).to.eql(jsonData.pets[0].age);",
+							"});",
+							"",
+							"pm.test(\"Second pet delete\", function () {",
+							"    let jsonData = JSON.parse(responseBody);",
+							"    pm.expect(pm.collectionVariables.get(\"second_petid\")).to.not.eql(jsonData.pets[0].id);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/pets?filter=my_pets",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "my_pets"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete first pet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/pets/{{first_petid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets",
+						"{{first_petid}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{auth_key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "auth_key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "petfriends.skillfactory.ru",
+			"type": "string"
+		},
+		{
+			"key": "auth_key",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "first_name",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "first_type",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "first_age",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "first_petid",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "second_name",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "second_type",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "second_age",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "second_petid",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "update_name",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "update_type",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "update_age",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
